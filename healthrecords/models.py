@@ -1,12 +1,10 @@
 import uuid, enum
 from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import post_save
-
 
 # Other Django Applications
 from serviceaccounts.models import Member as ACCOUNT
 from healthstandards.models import ExaminationStandard as EXAMINATIONSTANDARD
+
 
 # We decided to use a model(table) instead of having choices for one attribute of the model in order to have more dynamic application
 # not use yet
@@ -18,27 +16,23 @@ class FormGenderChoice(enum.Enum):   # A subclass of Enum
 
 
 class Examination(models.Model):
+    # 'user_created' Hint!! 'user_created' Must not be defined One_to_One because " “reverse” side of the relation will directly return a single object. "
     uuid = models.UUIDField(db_index=True, unique=True, blank=True, null=True)
     gender = models.CharField(max_length=15,
         choices=[(tag, tag.value) for tag in FormGenderChoice]  # Choices is a list of Tuple
     )
-
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
-    user_created = models.ForeignKey(ACCOUNT, related_name='user_created_examinations', on_delete=models.PROTECT) # Hint!! Must not be defined One_to_One because " “reverse” side of the relation will directly return a single object. "
-@receiver(post_save, sender=Examination)
-def create_examination_UUID(sender, instance=None, created=False, **kwargs):
-    if created:
-        instance.uuid = uuid.uuid5(uuid.NAMESPACE_DNS, str(instance.id))
-        instance.save()
+    user_created = models.ForeignKey(ACCOUNT, related_name='user_created_examinations', on_delete=models.PROTECT) 
+
 
 class ExaminationField(models.Model):
     name = models.CharField(max_length=127)
     examination = models.ForeignKey(Examination, db_index=True, related_name='examination_field', on_delete=models.PROTECT)
 
-# Middle Class between Examination-heathrecords and ExaminationStandard in health standards for Examination Models
+# Middle Class between Examination-heathrecords and \\
+# ExaminationStandard in health standards for Examination Models
 class StandardExamfieldMapping(models.Model): 
-    # Hint!! Must not define many_to_many field relation!! because: they actually have many_to_one relation 
-    # and defining middle class is just because we want these both classes be seperated logically
+    # 'examination_field' Hint!! Must not define many_to_many field relation!! because: they actually have many_to_one relation and defining middle class is just because we want these both classes be seperated logically
     examination_field = models.OneToOneField(ExaminationField, db_index=True, related_name='examinationfield_standard', on_delete=models.PROTECT)
     standard = models.ForeignKey(EXAMINATIONSTANDARD, related_name='standard_examination_mapping', on_delete=models.PROTECT)
 
@@ -46,27 +40,22 @@ class ExaminationRecord(models.Model):
     uuid = models.UUIDField(db_index=True, unique=True, blank=True, null=True)
     user = models.ForeignKey(ACCOUNT, related_name='user_examination_records', on_delete=models.PROTECT)
     examination = models.ForeignKey(Examination, related_name='examination_records', on_delete=models.PROTECT)
-@receiver(post_save, sender=ExaminationRecord)
-def create_examination_record_UUID(sender, instance=None, created=False, **kwargs):
-    if created:
-        instance.uuid = uuid.uuid5(uuid.NAMESPACE_DNS, str(instance.id))
-        instance.save()
+
 
 class ExaminationRecordField(models.Model):
+    # 'description' Hint!! Adding description to the existing or nonexisting record field if it is required
     examination_record = models.ForeignKey(ExaminationRecord, related_name='examination_record_results', on_delete=models.PROTECT)
     examination_field = models.ForeignKey(ExaminationField, related_name='examination_field_results', on_delete=models.PROTECT)
     value = models.CharField(max_length=100, blank=True, null=True)
-    # Hint!! Adding description to the existing or nonexisting record field if it is required
     description = models.CharField(max_length=500, blank=True, null=True) 
 
 
-
-
-from enum import Enum
 from django.contrib.postgres.fields import FloatRangeField, ArrayField
 from healthstandards.models import TestStandard as TESTSTANDARD
 
+
 # We decided to use a model(table) instead of having choices for one attribute of the model in order to have more dynamic application
+# from enum import Enum
 # class TestFieldTypeChoice(Enum):   # A subclass of Enum
 #     INT = "Integer"
 #     STR = "String"
@@ -82,11 +71,7 @@ class Test(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     user_created = models.ForeignKey(ACCOUNT, related_name='user_created_tests', on_delete=models.PROTECT)
-@receiver(post_save, sender=Test)
-def create_test_UUID(sender, instance=None, created=False, **kwargs):
-    if created:
-        instance.uuid = uuid.uuid5(uuid.NAMESPACE_DNS, str(instance.id))
-        instance.save()
+
 
 class TestFieldTypeChoice(models.Model):
     name = models.CharField(max_length=63)
@@ -121,8 +106,7 @@ class TestFieldValidStrArray(models.Model):
 
 # Middle Class between Test-heathrecords and TestStandard in health standards for Test Models
 class StanardTestfieldMapping(models.Model): 
-    # Hint!! Must not define many_to_many field relation!! because: they actually have many_to_one relation
-    # and defining middle class is just because we want these both classes be seperated logically
+    # 'test_field' Hint!! Must not define many_to_many field relation!! because: they actually have many_to_one relation and defining middle class is just because we want these both classes be seperated logically
     test_field = models.OneToOneField(TestField, db_index=True, related_name='test_field_standard', on_delete=models.PROTECT)
     standard = models.ForeignKey(TESTSTANDARD, related_name='standard_test_mapping', on_delete=models.PROTECT)
 
@@ -130,11 +114,7 @@ class TestRecord(models.Model):
     uuid = models.UUIDField(db_index=True, unique=True, blank=True, null=True)
     user = models.ForeignKey(ACCOUNT, related_name='user_test_records', on_delete=models.PROTECT)
     test = models.ForeignKey(Test, related_name='test_records', on_delete=models.PROTECT)
-@receiver(post_save, sender=TestRecord)
-def create_test_record_UUID(sender, instance=None, created=False, **kwargs):
-    if created:
-        instance.uuid = uuid.uuid5(uuid.NAMESPACE_DNS, str(instance.id))
-        instance.save()
+
 
 class TestRecordField(models.Model):
     test_record = models.ForeignKey(TestRecord, related_name='test_record_results', on_delete=models.PROTECT)
