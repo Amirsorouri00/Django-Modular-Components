@@ -4,7 +4,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
 
 
-def pure_must_be_type_of(user_type, function=None):
+def _pure_must_be_type_of(user_type, function=None):
     def wrap(request_user, *args, **kwargs):
         # print(request_user)
         for role in request_user.roles.all():
@@ -27,16 +27,21 @@ def must_be_type_of(user_type, function=None, redirect_field_name=REDIRECT_FIELD
     '''
     # print('Inside "must_be_type_of" function. and user type which is passed through is = {0} and function is\
     #  {1}'.format(user_type, function))
-    result = pure_must_be_type_of(user_type, function)
+    result = _pure_must_be_type_of(user_type, function)
     actual_decorator = user_passes_test(
         # lambda u: pure_must_be_type_of(user_type, function),
-        pure_must_be_type_of(user_type, function),
+        _pure_must_be_type_of(user_type, function),
         login_url=login_url,
         redirect_field_name=redirect_field_name
     )
     if function:
         return actual_decorator(function)
     return actual_decorator
+
+
+
+
+
 
 def must_be_type_of_student():
     '''

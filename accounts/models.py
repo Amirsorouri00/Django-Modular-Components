@@ -35,6 +35,12 @@ class User(AbstractUser):
     uuid = models.UUIDField(db_index=True, unique=True, blank=True, null=True)
     roles = models.ManyToManyField(Role)
 
+    @property
+    def popularity(self):
+        likes = 12
+        time = 12 #hours since created
+        return likes / time if time > 0 else likes
+
 class Profile(models.Model):
     #_safedelete_policy = NO_DELETE
     user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='user_profile', primary_key=True, on_delete=models.PROTECT)

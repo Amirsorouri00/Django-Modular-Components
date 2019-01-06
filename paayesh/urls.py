@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.urls import path
+from django.conf.urls import url
 from accounts.views import admins as admin_user
+from accounts.views.rest.views import CustomAuthToken
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +28,7 @@ urlpatterns = [
     path('serviceaccount/', include('serviceaccounts.urls')),
     path('accounts/signup/', admin_user.AdminSignUpView.as_view(), name='sign_up'),
     path('accounts/signup/', admin_user.AdminSignUpView.as_view(), name='home'),
+    url(r'^api-token-auth/', csrf_exempt(CustomAuthToken.as_view()), name='api_token_auth'),
+
 
 ]

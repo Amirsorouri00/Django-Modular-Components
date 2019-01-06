@@ -19,3 +19,11 @@ class AdminSignUpForm(UserCreationForm):
         # student = Student.objects.create(user=user)
         # student.interests.add(*self.cleaned_data.get('interests'))
         return user
+
+class AdminForm(forms.Form):
+    name = forms.CharField()
+    message = forms.CharField(widget=forms.Textarea)
+
+    def send_email(self):
+        # send email using the self.cleaned_data dictionary
+        pass

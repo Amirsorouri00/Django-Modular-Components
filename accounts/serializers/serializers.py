@@ -25,6 +25,13 @@ class ServiceaccountMemberSerializer(cserializers.DynamicFieldsModelSerializer):
         instance.save()
         return instance
 
+    # def update(self, instance, validated_data):
+    #     for f in UserSerializer.Meta.fields + UserSerializer.Meta.write_only_fields:
+    #         set_attr(instance, f, validated_data[f])
+    #     instance.set_password(validated_data['password'])
+    #     instance.save()
+    #     return instance
+
     def get_excluder(self, obj):
         # return obj.id ::Example
         return ''

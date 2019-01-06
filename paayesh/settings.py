@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'django_extensions',
     'rest_framework',
+    'rest_framework.authtoken',
     'crispy_forms',
 ]
 
@@ -52,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -179,3 +180,22 @@ GRAPH_MODELS = {
   'all_applications': True,
   'group_models': True,
 }
+
+##################
+# Authentication #
+##################
+# LOGOUT_REDIRECT_URL = ''
+PASSWORD_RESET_TIMEOUT_DAYS = 1
+    
+#################
+# Email configs #
+#################
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_FILE_PATH = "/var/www/neolej.ir/emails/sent"
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 25
+# EMAIL_HOST_USER = 'support@neolej.ir'
+# EMAIL_HOST_PASSWORD = 'gfLr96nk'
+# EMAIL_USE_TLS = False
+# DEFAULT_FROM_EMAIL = 'Neolej Support <support@neolej.ir>'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
